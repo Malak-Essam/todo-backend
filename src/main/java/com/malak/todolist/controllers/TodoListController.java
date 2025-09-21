@@ -17,9 +17,5 @@ public class TodoListController {
         this.todoListService = todoListService;
     }
 
-    @GetMapping
-    public List<TodoList> getLists() {
-        return todoListService.getAllLists();
-    }
     
 }
