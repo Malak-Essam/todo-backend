@@ -1,8 +1,12 @@
 package com.malak.todolist.controllers;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
+
+import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.services.TodoListService;
 @RestController
 @RequestMapping("/api/lists")
@@ -14,7 +18,7 @@ public class TodoListController {
     }
 
     @GetMapping
-    public String getLists() {
+    public List<TodoList> getLists() {
         return todoListService.getAllLists();
     }
     

@@ -1,11 +1,13 @@
 package com.malak.todolist.controllers;
 
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.malak.todolist.entities.User;
 import com.malak.todolist.services.UserService;
-
-import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/users")
@@ -17,7 +19,7 @@ public class UserController {
     }
 
     @GetMapping
-    public String getUsers() {
+    public List<User> getUsers() {
         return userService.getAllUsers();
     }
     
