@@ -1,7 +1,6 @@
 package com.malak.todolist.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.entities.User;
 import com.malak.todolist.repositories.TodoListRepository;
-import com.malak.todolist.repositories.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -23,13 +21,12 @@ public class TodoListService {
         this.userService = userService;
     }
 
-    public TodoList getList(UUID id) {
-        return todoListRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("List with id " + id + " not found"));
+    public TodoList getList(UUID listId, UUID userId) {
+        return todoListRepository.findByIdAndUserId(listId, userId).orElseThrow(
+                () -> new EntityNotFoundException("List with id " + listId + " not found or access denied"));
     }
 
     public List<TodoList> getAllMyLists(UUID userId) {
-        User user = userService.getUser(userId);
         return todoListRepository.findByUserId(userId);
     }
 
@@ -39,12 +36,12 @@ public class TodoListService {
         return todoListRepository.save(todoList);
     }
 
-    public void deleteList(UUID id) {
-        TodoList list = getList(id);
-        todoListRepository.delete(list);;
+    public void deleteList(UUID listId, UUID userId) {
+        TodoList list = getList(listId, userId);
+        todoListRepository.delete(list);
     }
-    public TodoList updateList(UUID id, TodoList updatedList) {
-        TodoList existingList = getList(id);
+    public TodoList updateList(UUID listId, UUID userId, TodoList updatedList) {
+        TodoList existingList = getList(listId, userId);
         existingList.setTitle(updatedList.getTitle());
         existingList.setDescription(updatedList.getDescription());
         return todoListRepository.save(existingList);

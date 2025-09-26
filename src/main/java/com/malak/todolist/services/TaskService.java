@@ -1,7 +1,6 @@
 package com.malak.todolist.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.malak.todolist.entities.Task;
 import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.repositories.TaskRepository;
-import com.malak.todolist.repositories.TodoListRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -33,8 +31,8 @@ public class TaskService {
         userService.getUser(userId);
         return taskRepository.findByListUserId(userId);
     }
-    public Task createTask(Task task, UUID listId) {
-        TodoList list = todoListService.getList(listId);
+    public Task createTask(UUID listId, UUID userId ,Task task ) {
+        TodoList list = todoListService.getList(listId, userId);
         task.setList(list);
         return taskRepository.save(task);
     }
