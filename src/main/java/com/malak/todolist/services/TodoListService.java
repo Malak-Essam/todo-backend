@@ -40,6 +40,9 @@ public class TodoListService {
         TodoList list = getList(listId, userId);
         todoListRepository.delete(list);
     }
+    public void deleteTodoListsByUser(User user) {
+        todoListRepository.deleteByUserId(user.getId());
+    }
     public TodoList updateList(UUID listId, UUID userId, TodoList updatedList) {
         TodoList existingList = getList(listId, userId);
         existingList.setTitle(updatedList.getTitle());

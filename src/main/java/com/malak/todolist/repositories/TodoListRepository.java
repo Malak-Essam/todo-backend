@@ -11,4 +11,5 @@ import com.malak.todolist.entities.TodoList;
 public interface TodoListRepository extends JpaRepository<TodoList, UUID> {
     public List<TodoList> findByUserId(UUID userId);
     public Optional<TodoList> findByIdAndUserId(UUID listId, UUID userId);
+    public void deleteByUserId(UUID userId);
 }

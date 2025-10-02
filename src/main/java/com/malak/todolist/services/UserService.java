@@ -1,7 +1,6 @@
 package com.malak.todolist.services;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -44,6 +43,7 @@ public class UserService {
         User existingUser = getUser(id);
         existingUser.setUsername(updatedUser.getUsername());
         existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setPassword(updatedUser.getPassword());
         return userRepository.save(existingUser);
     }
 }
