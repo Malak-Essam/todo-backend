@@ -13,9 +13,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 @Entity
 @Getter
 @Setter
@@ -33,7 +35,7 @@ public class TodoList {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
@@ -41,15 +43,14 @@ public class TodoList {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    
-
+    @Builder
     public TodoList(String title, String description, User user) {
         this.title = title;
         this.description = description;
         this.user = user;
     }
 
-    @PrePersist 
+    @PrePersist
     void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
@@ -59,4 +60,21 @@ public class TodoList {
     void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true; // same object
+        if (o == null || getClass() != o.getClass())
+            return false; // different type
+        TodoList todoList = (TodoList) o;
+        // if id is null, consider entities not equal
+        return id != null && id.equals(todoList.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
 }
