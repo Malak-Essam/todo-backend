@@ -117,7 +117,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void userService_updateUser_(){
+    public void userService_updateUser_updateEmailWorks(){
         User user = User.builder().username("malak").email("malak@test.com").password("123").build();
         userRepository.save(user);
 
@@ -130,12 +130,12 @@ public class UserServiceTest {
     }
     @Test
     public void userService_updateUser_throwsException_whenUserNotFound() {
-        UUID randomId = UUID.randomUUID();
+        UUID id = UUID.randomUUID();
         User updatedUser = User.builder().username("a").email("a@test.com").password("123").build();
 
-        Assertions.assertThatThrownBy(() -> userService.updateUser(randomId, updatedUser))
+        Assertions.assertThatThrownBy(() -> userService.updateUser(id, updatedUser))
             .isInstanceOf(EntityNotFoundException.class)
-            .hasMessage("User with " + randomId + " not found");
+            .hasMessage("User with " + id + " not found");
     }
 
 
