@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,6 +47,7 @@ public class Task {
     @ManyToOne
     private TodoList list;
 
+    @Builder
     public Task(String title, String description, Status status, LocalDateTime dueDate, TodoList list) {
         this.title = title;
         this.description = description;
@@ -63,5 +65,18 @@ public class Task {
     @PreUpdate
     void onUpdate() {
         this.updatedAt = LocalDateTime.now();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || obj.getClass() != getClass()) return false;
+        Task task = (Task) obj;
+
+        return id != null && id.equals(task.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null? id.hashCode():0;
     }
 }
