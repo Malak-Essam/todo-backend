@@ -42,7 +42,6 @@ public class UserService {
     public User updateUser(UUID id, User updatedUser) {
         User existingUser = getUser(id);
         existingUser.setUsername(updatedUser.getUsername());
-        existingUser.setEmail(updatedUser.getEmail());
         existingUser.setPassword(updatedUser.getPassword());
         return userRepository.save(existingUser);
     }

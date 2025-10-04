@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.malak.todolist.dtos.CreateUserDto;
+import com.malak.todolist.dtos.UpdateUserDto;
 import com.malak.todolist.dtos.UserDto;
 import com.malak.todolist.entities.User;
 
@@ -31,4 +32,12 @@ public class UserMapper {
         .password(createUserDto.getPassword())
         .build();
     }
+    public static User fromUpdateUserDto(UpdateUserDto updateUserDto){
+        if (updateUserDto == null) return null;
+        return User.builder()
+        .username(updateUserDto.getUsername())
+        .password(updateUserDto.getPassword())
+        .build();
+    }
+
 }
