@@ -1,6 +1,7 @@
 package com.malak.todolist.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -11,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.malak.todolist.dtos.CreateTodoListDto;
 import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.entities.User;
 import com.malak.todolist.repositories.TodoListRepository;
@@ -28,7 +31,8 @@ public class TodoListControllerTest {
     private TodoListRepository todoListRepository;
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private ObjectMapper objectMapper;
     @BeforeEach
     public void setup() {
         todoListRepository.deleteAll();
@@ -86,5 +90,27 @@ public class TodoListControllerTest {
             .andExpect(jsonPath("$.length()").value(2))
             .andExpect(jsonPath("$[0].title").value("List 1"))
             .andExpect(jsonPath("$[1].title").value("List 2"));
+    }
+    @Test
+    public void createList_shouldCreateAndReturnNewList() throws Exception {
+        User user = User.builder()
+            .username("malak")
+            .email("malak@gmail.com")
+            .password("123")
+            .build();
+        userRepository.save(user);
+        CreateTodoListDto newList = CreateTodoListDto.builder()
+            .title("New List")
+            .description("Created list")
+            .build();
+        mockMvc.perform(
+            post("/api/lists")
+            .param("userId", user.getId().toString())
+            .contentType("application/json")
+            .content(objectMapper.writeValueAsString(newList)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.title").value("New List"))
+            .andExpect(jsonPath("$.description").value("Created list"))
+            .andExpect(jsonPath("$.userDto.username").value("malak"));
     }
 }
