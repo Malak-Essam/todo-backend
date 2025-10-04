@@ -10,6 +10,7 @@ public class TodoListMapper {
         if (list == null)
             return null;
         return TodoListDto.builder()
+                .id(list.getId())
                 .title(list.getTitle())
                 .description(list.getDescription())
                 .userDto(UserMapper.toDto(list.getUser()))
