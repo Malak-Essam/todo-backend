@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.UUID;
 
 import org.assertj.core.api.Assertions;
-import org.h2.command.dml.Update;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,5 +102,13 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(Matchers.containsString("User with")))
                 .andExpect(jsonPath("$.message").value(Matchers.containsString("not found")));
+    }
+    @Test
+    public void deleteUser_shouldDeleteUser() throws Exception {
+        User user = userRepository.findAll().get(0);
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                .delete("/api/users/" + user.getId()))
+                .andExpect(status().isNoContent());
+        Assertions.assertThat(userRepository.findById(user.getId())).isEmpty();
     }
 }
