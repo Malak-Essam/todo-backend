@@ -29,10 +29,12 @@ public class TodoListController {
         this.todoListService = todoListService;
     }
     @GetMapping
-    public List<TodoList> getAllMyLists() {
-        // this is just a placeholder
-        UUID currentUserId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"); // Simulate getting the current user's ID
-        return todoListService.getAllMyLists(currentUserId);
+    public ResponseEntity<List<TodoListDto>> getAllMyLists(@RequestParam UUID userId) {
+        List<TodoList> todoLists = todoListService.getAllMyLists(userId);
+        List<TodoListDto> todoListDtos = todoLists.stream()
+            .map(TodoListMapper::toDto)
+            .toList();
+        return ResponseEntity.ok(todoListDtos);
     }
     @GetMapping("/{listId}")
     public ResponseEntity<TodoListDto> getList(

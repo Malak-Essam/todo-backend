@@ -60,4 +60,31 @@ public class TodoListControllerTest {
             .andExpect(jsonPath("$.userDto.username").value("malak"));
             
     }
+    @Test
+    public void getAllMyLists_shouldReturnAllListsForUser() throws Exception {
+        User user = User.builder()
+            .username("malak")
+            .email("malak@gmail.com")
+            .password("123")
+            .build();
+        userRepository.save(user);
+        TodoList list1 = TodoList.builder()
+            .title("List 1")
+            .description("First list")
+            .user(user)
+            .build();
+        TodoList list2 = TodoList.builder()
+            .title("List 2")
+            .description("Second list")
+            .user(user)
+            .build();
+        todoListRepository.save(list1);
+        todoListRepository.save(list2);
+        mockMvc.perform(get("/api/lists")
+        .param("userId", user.getId().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].title").value("List 1"))
+            .andExpect(jsonPath("$[1].title").value("List 2"));
+    }
 }
