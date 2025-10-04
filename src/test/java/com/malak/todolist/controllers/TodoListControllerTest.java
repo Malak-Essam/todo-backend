@@ -1,11 +1,13 @@
 package com.malak.todolist.controllers;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,5 +145,27 @@ public class TodoListControllerTest {
             .andExpect(jsonPath("$.title").value("Updated Title"))
             .andExpect(jsonPath("$.description").value("Updated Description"))
             .andExpect(jsonPath("$.userDto.username").value("malak"));
+    }
+
+    @Test
+    public void deleteList_shouldDeleteList() throws Exception {
+        User user = User.builder()
+            .username("malak")
+            .email("malak@gmail.com")
+            .password("123")
+            .build();
+        userRepository.save(user);
+        TodoList list = TodoList.builder()
+            .title("To be deleted")
+            .description("This list will be deleted")
+            .user(user)
+            .build();
+        todoListRepository.save(list);
+        mockMvc.perform(
+            delete("/api/lists/" + list.getId())
+            .param("userId", user.getId().toString()))
+            .andExpect(status().isNoContent());
+        // Verify the list is deleted
+        Assertions.assertThat(todoListRepository.findById(list.getId())).isEmpty();
     }
 }
