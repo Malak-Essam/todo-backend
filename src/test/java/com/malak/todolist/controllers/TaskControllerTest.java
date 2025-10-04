@@ -65,4 +65,41 @@ public class TaskControllerTest {
             .andExpect(jsonPath("$").isArray())
             .andExpect(jsonPath("$[0].listDto.id").value(createdList.getId().toString()));
     }
+    @Test
+    public void getTasksINTodoList_shouldReturnListOfTaskDtos() throws Exception {
+        User user = User.builder()
+            .username("malak")
+            .email("malak@gmail.com")
+            .password("123456")
+            .build();
+        userService.createUser(user);
+        TodoList list = TodoList.builder()
+            .title("My List")
+            .description("This is my list")
+            .user(user)
+            .build();
+        TodoList createdList = todoListService.createList(list,user.getId());
+        Task task1 = Task.builder()
+            .title("Test Task")
+            .description("This is a test task")
+            .status(Status.IN_PROGRESS)
+            .dueDate(LocalDateTime.now().plusDays(1))
+            .list(list)
+            .build();
+        Task task2 = Task.builder()
+            .title("Test Task 2")
+            .description("This is another test task")
+            .status(Status.PENDING)
+            .dueDate(LocalDateTime.now().plusDays(2))
+            .list(list)
+            .build();
+        taskService.createTask(list.getId(), user.getId(), task1);
+        taskService.createTask(list.getId(), user.getId(), task2);
+
+        mockMvc.perform(get("/api/tasks/" + createdList.getId().toString())
+            .param("userId", user.getId().toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].listDto.id").value(createdList.getId().toString()));
+    }
 }

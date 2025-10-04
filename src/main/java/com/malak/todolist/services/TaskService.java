@@ -31,6 +31,10 @@ public class TaskService {
         userService.getUser(userId);
         return taskRepository.findByListUserId(userId);
     }
+    public List<Task> getTasksOfList(UUID listId, UUID userId) {
+        TodoList list = todoListService.getList(listId, userId);
+        return taskRepository.findByListId(list.getId());
+    }
     public Task createTask(UUID listId, UUID userId ,Task task ) {
         TodoList list = todoListService.getList(listId, userId);
         task.setList(list);
