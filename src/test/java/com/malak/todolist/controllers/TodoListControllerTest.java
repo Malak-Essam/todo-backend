@@ -2,6 +2,7 @@ package com.malak.todolist.controllers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.malak.todolist.dtos.CreateTodoListDto;
+import com.malak.todolist.dtos.UpdateTodoListDto;
 import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.entities.User;
 import com.malak.todolist.repositories.TodoListRepository;
@@ -111,6 +113,35 @@ public class TodoListControllerTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.title").value("New List"))
             .andExpect(jsonPath("$.description").value("Created list"))
+            .andExpect(jsonPath("$.userDto.username").value("malak"));
+    }
+
+    @Test
+    public void updateList_shouldUpdateAndReturnUpdatedList() throws Exception {
+        User user = User.builder()
+            .username("malak")
+            .email("malak@gmail.com")
+            .password("123")
+            .build();
+        userRepository.save(user);
+        TodoList list = TodoList.builder()
+            .title("Old Title")
+            .description("Old Description")
+            .user(user)
+            .build();
+        todoListRepository.save(list);
+        UpdateTodoListDto updatedList = UpdateTodoListDto.builder()
+            .title("Updated Title")
+            .description("Updated Description")
+            .build();
+        mockMvc.perform(
+            put("/api/lists/" + list.getId())
+            .param("userId", user.getId().toString())
+            .contentType("application/json")
+            .content(objectMapper.writeValueAsString(updatedList)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.title").value("Updated Title"))
+            .andExpect(jsonPath("$.description").value("Updated Description"))
             .andExpect(jsonPath("$.userDto.username").value("malak"));
     }
 }
