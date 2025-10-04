@@ -15,7 +15,6 @@ import com.malak.todolist.entities.Task;
 import com.malak.todolist.mappers.TaskMapper;
 import com.malak.todolist.services.TaskService;
 
-
 @RestController
 @RequestMapping("/api/tasks")
 public class TaskController {
@@ -29,19 +28,27 @@ public class TaskController {
     public ResponseEntity<List<TaskDto>> getMyTasks(@RequestParam UUID userId) {
         List<Task> tasks = taskService.getAllMyTasks(userId);
         List<TaskDto> taskDtos = tasks.stream()
-            .map(TaskMapper::toDto)
-            .toList();
+                .map(TaskMapper::toDto)
+                .toList();
         return ResponseEntity.ok(taskDtos);
     }
-    @GetMapping("/{listId}")
-    public ResponseEntity<List<TaskDto>> getTasksINTodoList(@PathVariable UUID listId, @RequestParam UUID userId) {
+
+    @GetMapping("/list/{listId}")
+    public ResponseEntity<List<TaskDto>> getTasksInTodoList(@PathVariable UUID listId, @RequestParam UUID userId) {
         List<Task> tasks = taskService.getTasksOfList(listId, userId);
         List<TaskDto> taskDtos = tasks.stream()
-            .map(TaskMapper::toDto)
-            .toList();
+                .map(TaskMapper::toDto)
+                .toList();
         return ResponseEntity.ok().body(taskDtos);
     }
-    
-    
-    
+
+    @GetMapping("/{taskId}")
+    public ResponseEntity<TaskDto> getTask(
+            @PathVariable UUID taskId) {
+                Task task = taskService.getTask(taskId);
+                TaskDto taskDto = TaskMapper.toDto(task);
+
+        return ResponseEntity.ok().body(taskDto);
+    }
+
 }
