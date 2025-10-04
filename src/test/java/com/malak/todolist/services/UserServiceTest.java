@@ -117,16 +117,16 @@ public class UserServiceTest {
     }
 
     @Test
-    public void userService_updateUser_updateEmailWorks(){
+    public void userService_updateUser_updatePasswordWorks(){
         User user = User.builder().username("malak").email("malak@test.com").password("123").build();
         userRepository.save(user);
 
         UUID id = user.getId();
         // only change the email from com to org
-        User updateUser = User.builder().username("malak").email("malak@test.org").password("123").build();
+        User updateUser = User.builder().username("malak").email("malak@test.com").password("newPass").build();
         User userAfterUpdate = userService.updateUser(id, updateUser);
 
-        Assertions.assertThat(userAfterUpdate.getEmail()).isEqualTo("malak@test.org");
+        Assertions.assertThat(userAfterUpdate.getPassword()).isEqualTo("newPass");
     }
     @Test
     public void userService_updateUser_throwsException_whenUserNotFound() {

@@ -3,15 +3,19 @@ package com.malak.todolist.controllers;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.malak.todolist.dtos.TodoListDto;
 import com.malak.todolist.entities.TodoList;
+import com.malak.todolist.mappers.TodoListMapper;
 import com.malak.todolist.services.TodoListService;
 
 
@@ -31,11 +35,13 @@ public class TodoListController {
         return todoListService.getAllMyLists(currentUserId);
     }
     @GetMapping("/{listId}")
-    public TodoList getList(@PathVariable UUID listId) {
-        // this is just a placeholder
-        UUID currentUserId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"); // Simulate getting the current user's ID
-        return todoListService.getList(listId, currentUserId);
-    }
+    public ResponseEntity<TodoListDto> getList(
+        @PathVariable UUID listId,
+        @RequestParam UUID userId) {
+
+    TodoList list = todoListService.getList(listId, userId);
+    return ResponseEntity.ok(TodoListMapper.toDto(list));
+}
     @PostMapping
     public TodoList createList(@RequestBody TodoList list) {
         UUID currentUserId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000"); // Simulate getting the current user's ID
