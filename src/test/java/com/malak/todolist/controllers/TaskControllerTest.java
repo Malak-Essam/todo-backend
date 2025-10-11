@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,6 +24,7 @@ import com.malak.todolist.entities.Task;
 import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.entities.User;
 import com.malak.todolist.enums.Status;
+import com.malak.todolist.security.JwtService;
 import com.malak.todolist.services.TaskService;
 import com.malak.todolist.services.TodoListService;
 import com.malak.todolist.services.UserService;
@@ -45,6 +47,16 @@ public class TaskControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private JwtService jwtService;
+
+    private String token;
+
+    @BeforeEach
+    public void setUp(){
+        token = jwtService.generateToken("malak");
+    }
 
     @Test
     public void getMyTasks_shouldReturnTasks() throws Exception {
@@ -70,7 +82,8 @@ public class TaskControllerTest {
         taskService.createTask(list.getId(), user.getId(), task);
 
         mockMvc.perform(get("/api/tasks")
-                .param("userId", user.getId().toString()))
+                .param("userId", user.getId().toString())
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].listDto.id").value(createdList.getId().toString()));
@@ -108,7 +121,8 @@ public class TaskControllerTest {
         taskService.createTask(list.getId(), user.getId(), task2);
 
         mockMvc.perform(get("/api/tasks/list/" + createdList.getId().toString())
-                .param("userId", user.getId().toString()))
+                .param("userId", user.getId().toString())
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].listDto.id").value(createdList.getId().toString()));
@@ -136,7 +150,8 @@ public class TaskControllerTest {
                 .list(list)
                 .build();
         Task createdTask = taskService.createTask(list.getId(), user.getId(), task);
-        mockMvc.perform(get("/api/tasks/" + createdTask.getId()))
+        mockMvc.perform(get("/api/tasks/" + createdTask.getId())
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(createdTask.getId().toString()))
                 .andExpect(jsonPath("$.listDto.id").value(createdList.getId().toString()));
@@ -167,7 +182,8 @@ public class TaskControllerTest {
                 .param("listId", createdList.getId().toString())
                 .param("userId", user.getId().toString())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                .content(objectMapper.writeValueAsString(dto))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.listDto.id").value(createdList.getId().toString()));
@@ -204,7 +220,8 @@ public class TaskControllerTest {
 
         mockMvc.perform(put("/api/tasks/" + createdTask.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
+                .content(objectMapper.writeValueAsString(dto))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value(dto.getTitle()))
                 .andExpect(jsonPath("$.status").value(dto.getStatus().toString()));
@@ -233,7 +250,8 @@ public class TaskControllerTest {
                 .build();
         Task createdTask = taskService.createTask(list.getId(), user.getId(), task);
 
-        mockMvc.perform(delete("/api/tasks/" + createdTask.getId()))
+        mockMvc.perform(delete("/api/tasks/" + createdTask.getId())
+        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
     }
 }

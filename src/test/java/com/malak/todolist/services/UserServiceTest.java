@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.malak.todolist.entities.User;
 import com.malak.todolist.repositories.UserRepository;
@@ -17,7 +18,7 @@ import com.malak.todolist.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @DataJpaTest
-@Import(UserService.class)
+@Import({UserService.class, BCryptPasswordEncoder.class})
 public class UserServiceTest {
 
     @Autowired
@@ -25,6 +26,9 @@ public class UserServiceTest {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
 
     @Test
@@ -126,7 +130,7 @@ public class UserServiceTest {
         User updateUser = User.builder().username("malak").email("malak@test.com").password("newPass").build();
         User userAfterUpdate = userService.updateUser(id, updateUser);
 
-        Assertions.assertThat(userAfterUpdate.getPassword()).isEqualTo("newPass");
+        Assertions.assertThat(passwordEncoder.matches("newPass", userAfterUpdate.getPassword())).isTrue();
     }
     @Test
     public void userService_updateUser_throwsException_whenUserNotFound() {

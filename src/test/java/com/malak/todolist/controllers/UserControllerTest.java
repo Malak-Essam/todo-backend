@@ -23,6 +23,7 @@ import com.malak.todolist.dtos.CreateUserDto;
 import com.malak.todolist.dtos.UpdateUserDto;
 import com.malak.todolist.entities.User;
 import com.malak.todolist.repositories.UserRepository;
+import com.malak.todolist.security.JwtService;
 
 import jakarta.transaction.Transactional;
 
@@ -38,15 +39,21 @@ public class UserControllerTest {
     private UserRepository userRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Autowired
+    private JwtService jwtService;
+    private String token;
+
     @BeforeEach
     private void setUp() {
         userRepository.save(User.builder().username("malak").email("malak@test.com").password("123").build());
         userRepository.save(User.builder().username("john").email("john@test.com").password("456").build());
+        token = jwtService.generateToken("malak");
     }
 
     @Test
     public void getUsers_shouldReturnUsers() throws Exception {
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/users")
+        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].username").value("malak"));
@@ -55,7 +62,8 @@ public class UserControllerTest {
     @Test
     public void getUser_shouldReturnSingleUser() throws Exception {
         User user = userRepository.findAll().get(0);
-        mockMvc.perform(get("/api/users/" + user.getId()))
+        mockMvc.perform(get("/api/users/" + user.getId())
+        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("malak"));
     }
@@ -66,7 +74,8 @@ public class UserControllerTest {
                 .build();
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createUserDto)))
+                .content(objectMapper.writeValueAsString(createUserDto))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.username").value("malak"))
                 .andExpect(jsonPath("$.email").value("malak@test.com"));
@@ -78,7 +87,8 @@ public class UserControllerTest {
         UpdateUserDto updateUserDto = UpdateUserDto.builder().username("updatedMalak").password("newPassword").build();
         mockMvc.perform(put("/api/users/" + user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateUserDto)))
+                .content(objectMapper.writeValueAsString(updateUserDto))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("updatedMalak"))
                 .andExpect(jsonPath("$.id").value(user.getId().toString()));
@@ -88,7 +98,8 @@ public class UserControllerTest {
     public void updateUser_shouldReturnBadRequest_whenBodyMissing() throws Exception {
         UUID id = UUID.randomUUID();
         mockMvc.perform(put("/api/users/" + id)
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
     }
 
@@ -98,7 +109,8 @@ public class UserControllerTest {
         UpdateUserDto updateUserDto = UpdateUserDto.builder().username("updatedMalak").password("newPassword").build();
         mockMvc.perform(put("/api/users/" + nonExistentId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateUserDto)))
+                .content(objectMapper.writeValueAsString(updateUserDto))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value(Matchers.containsString("User with")))
                 .andExpect(jsonPath("$.message").value(Matchers.containsString("not found")));
@@ -107,7 +119,8 @@ public class UserControllerTest {
     public void deleteUser_shouldDeleteUser() throws Exception {
         User user = userRepository.findAll().get(0);
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-                .delete("/api/users/" + user.getId()))
+                .delete("/api/users/" + user.getId())
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isNoContent());
         Assertions.assertThat(userRepository.findById(user.getId())).isEmpty();
     }

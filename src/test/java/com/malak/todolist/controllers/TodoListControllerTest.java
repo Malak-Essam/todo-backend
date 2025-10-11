@@ -22,6 +22,7 @@ import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.entities.User;
 import com.malak.todolist.repositories.TodoListRepository;
 import com.malak.todolist.repositories.UserRepository;
+import com.malak.todolist.security.JwtService;
 
 import jakarta.transaction.Transactional;
 
@@ -37,10 +38,17 @@ public class TodoListControllerTest {
     private UserRepository userRepository;
     @Autowired
     private ObjectMapper objectMapper;
+
+     @Autowired
+    private JwtService jwtService;
+
+    private String token;
+
     @BeforeEach
     public void setup() {
         todoListRepository.deleteAll();
         userRepository.deleteAll();
+        token = jwtService.generateToken("malak");
     }
 
     @Test
@@ -61,7 +69,8 @@ public class TodoListControllerTest {
         todoListRepository.save(list);
 
         mockMvc.perform(get("/api/lists/" + list.getId())
-        .param("userId", user.getId().toString()))
+        .param("userId", user.getId().toString())
+        .header("Authorization", "Bearer " + token))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.title").value("My List"))
             .andExpect(jsonPath("$.description").value("Testing list"))
@@ -89,7 +98,8 @@ public class TodoListControllerTest {
         todoListRepository.save(list1);
         todoListRepository.save(list2);
         mockMvc.perform(get("/api/lists")
-        .param("userId", user.getId().toString()))
+        .param("userId", user.getId().toString())
+        .header("Authorization", "Bearer " + token))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(2))
             .andExpect(jsonPath("$[0].title").value("List 1"))
@@ -111,7 +121,8 @@ public class TodoListControllerTest {
             post("/api/lists")
             .param("userId", user.getId().toString())
             .contentType("application/json")
-            .content(objectMapper.writeValueAsString(newList)))
+            .content(objectMapper.writeValueAsString(newList))
+            .header("Authorization", "Bearer " + token))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.title").value("New List"))
             .andExpect(jsonPath("$.description").value("Created list"))
@@ -140,7 +151,8 @@ public class TodoListControllerTest {
             put("/api/lists/" + list.getId())
             .param("userId", user.getId().toString())
             .contentType("application/json")
-            .content(objectMapper.writeValueAsString(updatedList)))
+            .content(objectMapper.writeValueAsString(updatedList))
+            .header("Authorization", "Bearer " + token))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.title").value("Updated Title"))
             .andExpect(jsonPath("$.description").value("Updated Description"))
@@ -163,7 +175,8 @@ public class TodoListControllerTest {
         todoListRepository.save(list);
         mockMvc.perform(
             delete("/api/lists/" + list.getId())
-            .param("userId", user.getId().toString()))
+            .param("userId", user.getId().toString())
+            .header("Authorization", "Bearer " + token))
             .andExpect(status().isNoContent());
         // Verify the list is deleted
         Assertions.assertThat(todoListRepository.findById(list.getId())).isEmpty();
