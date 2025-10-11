@@ -1,8 +1,5 @@
 package com.malak.todolist.dtos;
 
-
-import com.malak.todolist.enums.Role;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,10 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @Builder
-public class CreateUserDto {
+public class LoginRequest {
     private String username;
-    private String email;
     private String password;
-    private Role role;
-    private boolean enabled;
 }

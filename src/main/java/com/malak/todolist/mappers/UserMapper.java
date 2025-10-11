@@ -16,6 +16,8 @@ public class UserMapper {
         .id(user.getId())
         .username(user.getUsername())
         .email(user.getEmail())
+        .role(user.getRole())
+        .enabled(user.isEnabled())
         .build();
     }
     public static List<UserDto> toDtoList(List<User> users){
@@ -30,6 +32,8 @@ public class UserMapper {
         .username(createUserDto.getUsername())
         .email(createUserDto.getEmail())
         .password(createUserDto.getPassword())
+        .role(createUserDto.getRole())
+        .enabled(createUserDto.isEnabled())
         .build();
     }
     public static User fromUpdateUserDto(UpdateUserDto updateUserDto){
@@ -37,6 +41,8 @@ public class UserMapper {
         return User.builder()
         .username(updateUserDto.getUsername())
         .password(updateUserDto.getPassword())
+        .role(updateUserDto.getRole())
+        .enabled(updateUserDto.isEnabled())
         .build();
     }
 
