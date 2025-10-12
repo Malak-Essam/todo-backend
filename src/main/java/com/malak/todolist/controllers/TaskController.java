@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import com.malak.todolist.dtos.TaskDto;
 import com.malak.todolist.dtos.UpdateTaskDto;
 import com.malak.todolist.entities.Task;
 import com.malak.todolist.mappers.TaskMapper;
+import com.malak.todolist.security.CustomUserDetails;
 import com.malak.todolist.services.TaskService;
 
 @RestController
@@ -31,8 +33,8 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskDto>> getMyTasks(@RequestParam UUID userId) {
-        List<Task> tasks = taskService.getAllMyTasks(userId);
+    public ResponseEntity<List<TaskDto>> getMyTasks(@AuthenticationPrincipal CustomUserDetails currentUser) {
+        List<Task> tasks = taskService.getAllMyTasks(currentUser.getUser().getId());
         List<TaskDto> taskDtos = tasks.stream()
                 .map(TaskMapper::toDto)
                 .toList();
@@ -40,8 +42,8 @@ public class TaskController {
     }
 
     @GetMapping("/list/{listId}")
-    public ResponseEntity<List<TaskDto>> getTasksInTodoList(@PathVariable UUID listId, @RequestParam UUID userId) {
-        List<Task> tasks = taskService.getTasksOfList(listId, userId);
+    public ResponseEntity<List<TaskDto>> getTasksInTodoList(@PathVariable UUID listId, @AuthenticationPrincipal CustomUserDetails currentUser) {
+        List<Task> tasks = taskService.getTasksOfList(listId, currentUser.getUser().getId());
         List<TaskDto> taskDtos = tasks.stream()
                 .map(TaskMapper::toDto)
                 .toList();
@@ -58,9 +60,9 @@ public class TaskController {
     }
 
     @PostMapping
-    public ResponseEntity<TaskDto> createTask(@RequestParam UUID listId, @RequestParam UUID userId, @RequestBody CreateTaskDto dto) {
+    public ResponseEntity<TaskDto> createTask(@RequestParam UUID listId, @AuthenticationPrincipal CustomUserDetails currentUser, @RequestBody CreateTaskDto dto) {
         Task task = TaskMapper.toEntity(dto);
-        Task createdTask = taskService.createTask(listId, userId, task);
+        Task createdTask = taskService.createTask(listId, currentUser.getUser().getId(), task);
         return ResponseEntity.ok().body(TaskMapper.toDto(createdTask));
     }
 
