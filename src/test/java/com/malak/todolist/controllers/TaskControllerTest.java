@@ -202,7 +202,7 @@ public class TaskControllerTest {
                 .description("This is my list")
                 .user(user)
                 .build();
-        TodoList createdList = todoListService.createList(list, user.getId());
+        todoListService.createList(list, user.getId());
         Task task = Task.builder()
                 .title("Test Task")
                 .description("This is a test task")
