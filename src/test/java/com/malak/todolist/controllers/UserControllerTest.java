@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.malak.todolist.dtos.CreateUserDto;
 import com.malak.todolist.dtos.UpdateUserDto;
 import com.malak.todolist.entities.User;
+import com.malak.todolist.enums.Role;
 import com.malak.todolist.repositories.UserRepository;
 import com.malak.todolist.security.JwtService;
 
@@ -70,7 +71,11 @@ public class UserControllerTest {
 
     @Test
     public void createUser_shouldReturnUser() throws Exception {
-        CreateUserDto createUserDto = CreateUserDto.builder().username("malak").email("malak@test.com").password("123")
+        CreateUserDto createUserDto = CreateUserDto.builder()
+        .username("malak")
+        .email("malak@test.com")
+        .password("1asdf23We456789")
+        .role(Role.USER)
                 .build();
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,7 +89,7 @@ public class UserControllerTest {
     @Test
     public void updateUser_shouldReturnUpdatedUser() throws Exception {
         User user = userRepository.findAll().get(0);
-        UpdateUserDto updateUserDto = UpdateUserDto.builder().username("updatedMalak").password("newPassword").build();
+        UpdateUserDto updateUserDto = UpdateUserDto.builder().username("updatedMalak").password("newPassword").role(Role.USER).build();
         mockMvc.perform(put("/api/users/" + user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateUserDto))
@@ -104,9 +109,13 @@ public class UserControllerTest {
     }
 
     @Test
-    public void getUser_shouldReturnNotFound() throws Exception {
+    public void updateUser_shouldReturnNotFound() throws Exception {
         UUID nonExistentId = UUID.randomUUID();
-        UpdateUserDto updateUserDto = UpdateUserDto.builder().username("updatedMalak").password("newPassword").build();
+        UpdateUserDto updateUserDto = UpdateUserDto.builder()
+        .username("updatedMalak")
+        .password("newPassword")
+        .role(Role.USER)
+        .build();
         mockMvc.perform(put("/api/users/" + nonExistentId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateUserDto))

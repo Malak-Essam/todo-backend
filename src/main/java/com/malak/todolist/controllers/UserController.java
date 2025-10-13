@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +20,17 @@ import com.malak.todolist.dtos.UserDto;
 import com.malak.todolist.entities.User;
 import com.malak.todolist.mappers.UserMapper;
 import com.malak.todolist.services.UserService;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
 import org.springframework.web.bind.annotation.PutMapping;
 
 
 
 @RestController
 @RequestMapping("/api/users")
+@Validated
 public class UserController {
     private final UserService userService;
 
@@ -39,20 +45,20 @@ public class UserController {
     }
     
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUser(@PathVariable UUID userId){
+    public ResponseEntity<UserDto> getUser(@PathVariable @NotNull UUID userId){
         UserDto userDto = UserMapper.toDto(userService.getUser(userId));
         return ResponseEntity.ok().body(userDto);
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> postMethodName(@RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<UserDto> createUser(@Valid @RequestBody CreateUserDto createUserDto) {
         User user = UserMapper.fromCreateUserDto(createUserDto);
         User createdUser = userService.createUser(user);
         UserDto userDto = UserMapper.toDto(createdUser);
         return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> putMethodName(@PathVariable UUID id, @RequestBody UpdateUserDto updateUserDto) {
+    public ResponseEntity<UserDto> updateUser(@NotNull @PathVariable UUID id, @Valid @RequestBody UpdateUserDto updateUserDto) {
         User user = UserMapper.fromUpdateUserDto(updateUserDto);
         User updated = userService.updateUser(id, user);
         UserDto userDto = UserMapper.toDto(updated);
@@ -60,7 +66,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID id){
+    public ResponseEntity<Void> deleteUser(@NotNull @PathVariable UUID id){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

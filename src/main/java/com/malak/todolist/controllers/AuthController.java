@@ -21,6 +21,8 @@ import com.malak.todolist.mappers.UserMapper;
 import com.malak.todolist.security.JwtService;
 import com.malak.todolist.services.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -36,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-public ResponseEntity<?> register(@RequestBody CreateUserDto dto) {
+public ResponseEntity<?> register(@Valid @RequestBody CreateUserDto dto) {
     User user = UserMapper.fromCreateUserDto(dto);
     User createdUser = userService.createUser(user);
 
@@ -52,7 +54,7 @@ public ResponseEntity<?> register(@RequestBody CreateUserDto dto) {
 }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())

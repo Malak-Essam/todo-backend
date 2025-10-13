@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +24,12 @@ import com.malak.todolist.mappers.TodoListMapper;
 import com.malak.todolist.security.CustomUserDetails;
 import com.malak.todolist.services.TodoListService;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+
 @RestController
 @RequestMapping("/api/lists")
+@Validated
 public class TodoListController {
     private final TodoListService todoListService;
 
@@ -43,7 +48,7 @@ public class TodoListController {
 
     @GetMapping("/{listId}")
     public ResponseEntity<TodoListDto> getList(
-            @PathVariable UUID listId,
+            @NotNull @PathVariable UUID listId,
             @AuthenticationPrincipal CustomUserDetails currentUser) {
 
         TodoList list = todoListService.getList(listId, currentUser.getUser().getId());
@@ -51,7 +56,7 @@ public class TodoListController {
     }
 
     @PostMapping
-    public ResponseEntity<TodoListDto> createList(@RequestBody CreateTodoListDto list, @AuthenticationPrincipal CustomUserDetails currentUser) {
+    public ResponseEntity<TodoListDto> createList(@Valid @RequestBody CreateTodoListDto list, @AuthenticationPrincipal CustomUserDetails currentUser) {
         TodoList todoList = TodoListMapper.fromCreteTodoListDto(list);
         TodoList newList = todoListService.createList(todoList, currentUser.getUser().getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(TodoListMapper.toDto(newList));
@@ -59,8 +64,8 @@ public class TodoListController {
 
     @PutMapping("/{listId}")
     public ResponseEntity<TodoListDto> updateList(
-            @PathVariable UUID listId,
-            @RequestBody UpdateTodoListDto list,
+            @NotNull @PathVariable UUID listId,
+            @Valid @RequestBody UpdateTodoListDto list,
             @AuthenticationPrincipal CustomUserDetails currentUser) {
         TodoList updateList = TodoListMapper.fromUpdateTodoListDto(list);
         TodoList updatedList = todoListService.updateList(listId, currentUser.getUser().getId(), updateList);
@@ -69,7 +74,7 @@ public class TodoListController {
     }
 
     @DeleteMapping("/{listId}")
-    public ResponseEntity<Void> deleteList(@PathVariable UUID listId, @AuthenticationPrincipal CustomUserDetails currentUser) {
+    public ResponseEntity<Void> deleteList(@NotNull @PathVariable UUID listId, @AuthenticationPrincipal CustomUserDetails currentUser) {
         todoListService.deleteList(listId, currentUser.getUser().getId());
         return ResponseEntity.noContent().build();
     }
