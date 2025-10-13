@@ -46,9 +46,9 @@ public class UserControllerTest {
 
     @BeforeEach
     private void setUp() {
-        userRepository.save(User.builder().username("malak").email("malak@test.com").password("123").build());
-        userRepository.save(User.builder().username("john").email("john@test.com").password("456").build());
-        token = jwtService.generateToken("malak");
+        userRepository.save(User.builder().username("test").email("malak@test.com").password("asdfsdf123").role(Role.ADMIN).build());
+        userRepository.save(User.builder().username("john").email("john@test.com").password("45dsfasf6").role(Role.ADMIN).build());
+        token = jwtService.generateToken("test", Role.ADMIN);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class UserControllerTest {
         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].username").value("malak"));
+                .andExpect(jsonPath("$[0].username").value("test"));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class UserControllerTest {
         mockMvc.perform(get("/api/users/" + user.getId())
         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("malak"));
+                .andExpect(jsonPath("$.username").value("test"));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class UserControllerTest {
         .username("malak")
         .email("malak@test.com")
         .password("1asdf23We456789")
-        .role(Role.USER)
+        .role(Role.ADMIN)
                 .build();
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -89,7 +89,7 @@ public class UserControllerTest {
     @Test
     public void updateUser_shouldReturnUpdatedUser() throws Exception {
         User user = userRepository.findAll().get(0);
-        UpdateUserDto updateUserDto = UpdateUserDto.builder().username("updatedMalak").password("newPassword").role(Role.USER).build();
+        UpdateUserDto updateUserDto = UpdateUserDto.builder().username("updatedMalak").password("newPassword").role(Role.ADMIN).build();
         mockMvc.perform(put("/api/users/" + user.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(updateUserDto))
@@ -114,7 +114,7 @@ public class UserControllerTest {
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
         .username("updatedMalak")
         .password("newPassword")
-        .role(Role.USER)
+        .role(Role.ADMIN)
         .build();
         mockMvc.perform(put("/api/users/" + nonExistentId)
                 .contentType(MediaType.APPLICATION_JSON)

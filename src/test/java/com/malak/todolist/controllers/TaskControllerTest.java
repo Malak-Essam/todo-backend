@@ -23,6 +23,7 @@ import com.malak.todolist.dtos.UpdateTaskDto;
 import com.malak.todolist.entities.Task;
 import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.entities.User;
+import com.malak.todolist.enums.Role;
 import com.malak.todolist.enums.Status;
 import com.malak.todolist.security.JwtService;
 import com.malak.todolist.services.TaskService;
@@ -55,7 +56,7 @@ public class TaskControllerTest {
 
     @BeforeEach
     public void setUp(){
-        token = jwtService.generateToken("malak");
+        token = jwtService.generateToken("malak", Role.USER);
     }
 
     @Test

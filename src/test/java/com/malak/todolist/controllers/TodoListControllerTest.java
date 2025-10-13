@@ -20,6 +20,7 @@ import com.malak.todolist.dtos.CreateTodoListDto;
 import com.malak.todolist.dtos.UpdateTodoListDto;
 import com.malak.todolist.entities.TodoList;
 import com.malak.todolist.entities.User;
+import com.malak.todolist.enums.Role;
 import com.malak.todolist.repositories.TodoListRepository;
 import com.malak.todolist.repositories.UserRepository;
 import com.malak.todolist.security.JwtService;
@@ -48,7 +49,7 @@ public class TodoListControllerTest {
     public void setup() {
         todoListRepository.deleteAll();
         userRepository.deleteAll();
-        token = jwtService.generateToken("malak");
+        token = jwtService.generateToken("malak", Role.USER);
     }
 
     @Test
