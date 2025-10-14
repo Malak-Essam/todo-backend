@@ -2,6 +2,7 @@ package com.malak.todolist.config;
 
 import java.util.Arrays; // Make sure to import this
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,6 +49,8 @@ public class SecurityConfig {
                 .build();
     }
 
+    @Value("${front.port}")
+    String frontPort;
     // ✅ ADD THIS BEAN TO CONFIGURE CORS (CORRECTED VERSION)
 @Bean
 public CorsConfigurationSource corsConfigurationSource() {
@@ -55,7 +58,7 @@ public CorsConfigurationSource corsConfigurationSource() {
     // Replace "*" with the actual origin of your frontend.
     // Common local development origins are http://127.0.0.1:5500 or http://localhost:3000 etc.
     // You can list multiple origins.
-    configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:5500", "http://localhost:5500")); // "null" is for file:// origin
+    configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:" + frontPort, "http://localhost:"+ frontPort)); // "null" is for file:// origin
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
     configuration.setAllowCredentials(true);
