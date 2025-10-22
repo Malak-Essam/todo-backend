@@ -55,10 +55,7 @@ public class SecurityConfig {
 @Bean
 public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    // Replace "*" with the actual origin of your frontend.
-    // Common local development origins are http://127.0.0.1:5500 or http://localhost:3000 etc.
-    // You can list multiple origins.
-    configuration.setAllowedOrigins(Arrays.asList("http://127.0.0.1:" + frontPort, "http://localhost:"+ frontPort)); // "null" is for file:// origin
+    configuration.setAllowedOrigins(Arrays.asList("https://todo-frontend-orcin-phi.vercel.app","http://127.0.0.1:" + frontPort, "http://localhost:"+ frontPort)); // "null" is for file:// origin
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
     configuration.setAllowCredentials(true);
